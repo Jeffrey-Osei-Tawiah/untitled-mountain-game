@@ -4,7 +4,7 @@ using UnityEngine.UI;
 public class JumpProgressVisual : MonoBehaviour
 {
     [SerializeField] private Slider jumpProgressBar;
-    [SerializeField] private PlayerMovement player;
+    [SerializeField] private PlayerScript player;
 
     public void Start()
     {
@@ -18,7 +18,7 @@ public class JumpProgressVisual : MonoBehaviour
         jumpProgressBar.gameObject.SetActive(false);
     }
 
-    private void Player_OnJumpPressed(object sender, PlayerMovement.OnJumpPressedArgs e)
+    private void Player_OnJumpPressed(object sender, PlayerScript.OnJumpPressedArgs e)
     {
         jumpProgressBar.gameObject.SetActive(true);
 

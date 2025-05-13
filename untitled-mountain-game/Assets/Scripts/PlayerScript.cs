@@ -2,14 +2,14 @@ using System;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerScript : MonoBehaviour
 {
-    public event EventHandler<OnMousePositionChangeArgs> OnMousePositionChange;
+    public event EventHandler<OnPlayerDirChangedArgs> OnPlayerDirChanged;
     public event EventHandler<OnJumpPressedArgs> OnJumpPressed;
     public event EventHandler OnJumpReleased;
-    public class OnMousePositionChangeArgs : EventArgs
+    public class OnPlayerDirChangedArgs : EventArgs
     {
-        public Vector2 relativeMouseDir;
+        public float playerDir;
     }
     public class OnJumpPressedArgs : EventArgs
     {
@@ -26,9 +26,6 @@ public class PlayerMovement : MonoBehaviour
     private float jumpAngle = 0;
 
     private float dir = 1.0f;
-    private Vector2 mouseDir;
-    private Vector2 oldMouseDir;
-
 
     private bool jumpButtonPressed = false;
     private bool jumpButtonReleased = false;
@@ -36,22 +33,38 @@ public class PlayerMovement : MonoBehaviour
     private float jumpPressedTime = 0.0f;
     [SerializeField]private float maxJumpPressedTime = 0.5f;
 
+    // Check ground variables
+    [SerializeField] private Transform checkGroundPoint;
+    [SerializeField] private float checkRadius = 0.2f;
+
     private void Awake()
     {
-        mouseDir = Vector2.zero;
-        oldMouseDir = Vector2.zero;
-
         rb = gameObject.GetComponent<Rigidbody2D>();
+    }
+
+    private void Start()
+    {
+        OnPlayerDirChanged?.Invoke(this, new OnPlayerDirChangedArgs { playerDir = 1 });
     }
     private void Update()
     {
+        HandleMovement();
+    }
 
+    private void HandleMovement()
+    {
         float hDir = Input.GetAxis("Horizontal");
         if (hDir != 0 && !jumpButtonPressed)
         {
-            dir = Mathf.Sign(hDir);
+            if(hDir != dir)
+            {
+                dir = Mathf.Sign(hDir);
+                OnPlayerDirChanged?.Invoke(this, new OnPlayerDirChangedArgs { playerDir = dir });
+            }
         }
         // add event to change sprite direction on direction change
+
+
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -63,17 +76,10 @@ public class PlayerMovement : MonoBehaviour
             jumpButtonReleased = true;
         }
 
-        mouseDir = GetRelativeMouseDirection();
-        if(mouseDir != oldMouseDir)
-        {
-            OnMousePositionChange?.Invoke(this, new OnMousePositionChangeArgs { relativeMouseDir = mouseDir });
-            oldMouseDir = mouseDir;
-        }
-
-        if(jumpButtonPressed && IsOnGround() && IsNearZero(rb.linearVelocity.magnitude))
+        if (jumpButtonPressed && IsOnGround() && IsNearZero(rb.linearVelocityX, 0.2f))
         {
 
-            if(jumpPressedTime < maxJumpPressedTime)
+            if (jumpPressedTime < maxJumpPressedTime)
                 jumpPressedTime += Time.deltaTime;
 
             float progress = jumpPressedTime / maxJumpPressedTime;
@@ -82,13 +88,13 @@ public class PlayerMovement : MonoBehaviour
 
             OnJumpPressed?.Invoke(this, new OnJumpPressedArgs { jumpProgress = progress });
         }
-        else if(jumpButtonReleased)
+        else if (jumpButtonReleased)
         {
             jumpButtonReleased = false;
             OnJumpReleased?.Invoke(this, EventArgs.Empty);
 
             // Player Jump
-            Vector2 force = jumpForce * (new Vector2(dir * Mathf.Cos(jumpAngle),Mathf.Sin(jumpAngle)));
+            Vector2 force = jumpForce * (new Vector2(dir * Mathf.Cos(jumpAngle), Mathf.Sin(jumpAngle)));
             rb.AddForce(force, ForceMode2D.Impulse);
 
             // Reset
@@ -99,20 +105,9 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private Vector2 GetRelativeMouseDirection()
-    {
-        Vector2 worldMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        //Vector2 worldMousePos = Input.mousePosition;
-        Vector2 dir = (worldMousePos - new Vector2(transform.position.x, transform.position.y)).normalized;
-        return dir;
-    }
-
     private bool IsOnGround()
     {
-        float distanceFromGround = 1.1f;
-        bool hit = Physics2D.Raycast(transform.position, Vector2.down, distanceFromGround, LayerMask.GetMask("Wall"));
-
-        return hit;
+        return Physics2D.CircleCast(checkGroundPoint.position, checkRadius, Vector2.down, 0.01f, LayerMask.GetMask("Wall"));
     }
 
     private bool IsNearZero(float value, float epsilon = 0.0001f)

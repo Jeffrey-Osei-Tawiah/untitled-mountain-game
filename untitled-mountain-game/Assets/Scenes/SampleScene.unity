@@ -737,7 +737,7 @@ GameObject:
   - component: {fileID: 932876913}
   - component: {fileID: 932876912}
   - component: {fileID: 932876911}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Floor (temp)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -754,7 +754,7 @@ BoxCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 5bfec3e5628f5574f839fdb62f67e78c, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1061,7 +1061,7 @@ GameObject:
   - component: {fileID: 1541495044}
   - component: {fileID: 1541495043}
   - component: {fileID: 1541495042}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Floor (temp) (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1130,7 +1130,7 @@ Rigidbody2D:
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_GravityScale: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 5bfec3e5628f5574f839fdb62f67e78c, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1325,7 +1325,7 @@ GameObject:
   - component: {fileID: 1684047822}
   - component: {fileID: 1684047821}
   - component: {fileID: 1684047820}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Floor (temp) (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1394,7 +1394,7 @@ Rigidbody2D:
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_GravityScale: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 5bfec3e5628f5574f839fdb62f67e78c, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1507,9 +1507,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxJumpForce: 20
-  maxJumpAngle: 0.7853982
+  maxJumpAngle: 1.047198
   minJumpForce: 5
   minJumpAngle: 0.5235988
+  maxJumpPressedTime: 0.5
 --- !u!4 &1776513627
 Transform:
   m_ObjectHideFlags: 0
@@ -1578,8 +1579,8 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDamping: 0
   m_AngularDamping: 0.05
-  m_GravityScale: 1
-  m_Material: {fileID: 0}
+  m_GravityScale: 2
+  m_Material: {fileID: 6200000, guid: 9efcf9a129321f8489aa9b44c8b2a7de, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1623,7 +1624,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NoiseProfile: {fileID: 11400000, guid: 46965f9cbaf525742a6da4c2172a99cd, type: 2}
   PivotOffset: {x: 0, y: 0, z: 0}
-  AmplitudeGain: 1.25
+  AmplitudeGain: 1
   FrequencyGain: 0.5
   m_NoiseOffsets: {x: 0, y: 0, z: 0}
 --- !u!114 &1965080477

@@ -34,7 +34,7 @@ public class PlayerMovement : MonoBehaviour
     private bool jumpButtonReleased = false;
 
     private float jumpPressedTime = 0.0f;
-    private float maxJumpPressedTime = 1.0f;
+    [SerializeField]private float maxJumpPressedTime = 0.5f;
 
     private void Awake()
     {
@@ -46,6 +46,13 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
 
+        float hDir = Input.GetAxis("Horizontal");
+        if (hDir != 0 && !jumpButtonPressed)
+        {
+            dir = Mathf.Sign(hDir);
+        }
+        // add event to change sprite direction on direction change
+
         if (Input.GetKeyDown(KeyCode.Space))
         {
             jumpButtonPressed = true;
@@ -56,13 +63,6 @@ public class PlayerMovement : MonoBehaviour
             jumpButtonReleased = true;
         }
 
-        float hDir = Input.GetAxis("Horizontal");
-        if (hDir != 0)
-        {
-            dir = Mathf.Sign(hDir);
-        }
-        // add event to change sprite direction on direction change
-
         mouseDir = GetRelativeMouseDirection();
         if(mouseDir != oldMouseDir)
         {
@@ -70,8 +70,9 @@ public class PlayerMovement : MonoBehaviour
             oldMouseDir = mouseDir;
         }
 
-        if(jumpButtonPressed)
+        if(jumpButtonPressed && IsOnGround() && IsNearZero(rb.linearVelocity.magnitude))
         {
+
             if(jumpPressedTime < maxJumpPressedTime)
                 jumpPressedTime += Time.deltaTime;
 
@@ -105,4 +106,18 @@ public class PlayerMovement : MonoBehaviour
         Vector2 dir = (worldMousePos - new Vector2(transform.position.x, transform.position.y)).normalized;
         return dir;
     }
+
+    private bool IsOnGround()
+    {
+        float distanceFromGround = 1.1f;
+        bool hit = Physics2D.Raycast(transform.position, Vector2.down, distanceFromGround, LayerMask.GetMask("Wall"));
+
+        return hit;
+    }
+
+    private bool IsNearZero(float value, float epsilon = 0.0001f)
+    {
+        return Mathf.Abs(value) < epsilon;
+    }
+
 }

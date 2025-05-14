@@ -20,6 +20,12 @@ public class PlayerScript : MonoBehaviour
     [SerializeField] private float minJumpForce = 5.0f;
     [SerializeField] private float minJumpAngle = 0;
 
+    [SerializeField] private float bounciness = 1;
+    [SerializeField] private float bounceExaggeration = 0.2f;
+
+    private bool shouldBounce = false;
+    private Vector2 pendingVelocity;
+
     private Rigidbody2D rb;
 
     private float jumpForce = 0;
@@ -51,6 +57,36 @@ public class PlayerScript : MonoBehaviour
         HandleMovement();
     }
 
+    private void FixedUpdate()
+    {
+        if(shouldBounce)
+        {
+            rb.linearVelocity = pendingVelocity;
+            shouldBounce = false;
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        // bounce physics
+        if(!IsOnGround())
+        {
+            // TODO: THIS SHOULD ONLY WORK FOR WALLS AND OBSTACLES
+
+            // Assume the first contact is representative
+            Vector2 normal = collision.contacts[0].normal;
+            Vector2 vel = collision.relativeVelocity;
+            // Get component of velocity parallel to surface normal
+            Vector2 vNormal = Vector2.Dot(vel, normal) * normal;
+            // Get component of velocity perpendicular to surface normal
+            Vector2 vSurface = vel - vNormal;
+
+            //vNormal and multiply by bounciness constant and add to vSurface
+            pendingVelocity = (bounciness * vNormal) - (bounciness * bounceExaggeration) * vSurface;
+            shouldBounce = true;
+        }
+    }
+
     private void HandleMovement()
     {
         float hDir = Input.GetAxis("Horizontal");
@@ -62,9 +98,6 @@ public class PlayerScript : MonoBehaviour
                 OnPlayerDirChanged?.Invoke(this, new OnPlayerDirChangedArgs { playerDir = dir });
             }
         }
-        // add event to change sprite direction on direction change
-
-
 
         if (Input.GetKeyDown(KeyCode.Space))
         {

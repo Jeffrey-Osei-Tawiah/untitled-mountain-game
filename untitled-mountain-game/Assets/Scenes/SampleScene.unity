@@ -1759,11 +1759,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxJumpForce: 30
   maxJumpAngle: 1.3
-  minJumpForce: 5
-  minJumpAngle: 0.5235988
+  minJumpForce: 7
+  minJumpAngle: 0.4
+  bounciness: 1
+  bounceExaggeration: 0.8
   maxJumpPressedTime: 0.5
   checkGroundPoint: {fileID: 988233676}
-  checkRadius: 0.2
+  checkRadius: 0.4
 --- !u!4 &1776513627
 Transform:
   m_ObjectHideFlags: 0
@@ -1833,7 +1835,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDamping: 0
   m_AngularDamping: 0.05
-  m_GravityScale: 2
+  m_GravityScale: 2.5
   m_Material: {fileID: 6200000, guid: 9efcf9a129321f8489aa9b44c8b2a7de, type: 2}
   m_IncludeLayers:
     serializedVersion: 2

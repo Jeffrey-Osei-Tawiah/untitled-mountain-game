@@ -15,33 +15,30 @@ public class PlayerScript : MonoBehaviour
     {
         public float jumpProgress;
     }
+
     [SerializeField] private float maxJumpForce = 20.0f;
     [SerializeField] private float maxJumpAngle = Mathf.PI / 4.0f;
     [SerializeField] private float minJumpForce = 5.0f;
     [SerializeField] private float minJumpAngle = 0;
-
-    [SerializeField] private float bounciness = 1;
-    [SerializeField] private float bounceExaggeration = 0.2f;
-
-    private bool shouldBounce = false;
-    private Vector2 pendingVelocity;
-
-    private Rigidbody2D rb;
-
+    [SerializeField] private float maxJumpPressedTime = 0.5f;
+    private float jumpPressedTime = 0.0f;
     private float jumpForce = 0;
     private float jumpAngle = 0;
-
-    private float dir = 1.0f;
-
     private bool jumpButtonPressed = false;
     private bool jumpButtonReleased = false;
 
-    private float jumpPressedTime = 0.0f;
-    [SerializeField]private float maxJumpPressedTime = 0.5f;
+    [SerializeField] private float bounciness = 1;
+    [SerializeField] private float bounceExaggeration = 0.2f;
+    private Rigidbody2D rb;
+    private bool shouldBounce = false;
+    private Vector2 pendingVelocity;
 
     // Check ground variables
     [SerializeField] private Transform checkGroundPoint;
     [SerializeField] private float checkRadius = 0.2f;
+
+    // Direction of jump (either in positive x - dir or negative x - dir)
+    private float dir = 1.0f;
 
     private void Awake()
     {
@@ -59,7 +56,7 @@ public class PlayerScript : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if(shouldBounce)
+        if (shouldBounce)
         {
             rb.linearVelocity = pendingVelocity;
             shouldBounce = false;
@@ -69,12 +66,13 @@ public class PlayerScript : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         // bounce physics
-        if(!IsOnGround())
+        if (!IsOnGround())
         {
             // TODO: THIS SHOULD ONLY WORK FOR WALLS AND OBSTACLES
 
             // Assume the first contact is representative
             Vector2 normal = collision.contacts[0].normal;
+
             Vector2 vel = collision.relativeVelocity;
             // Get component of velocity parallel to surface normal
             Vector2 vNormal = Vector2.Dot(vel, normal) * normal;
@@ -82,7 +80,17 @@ public class PlayerScript : MonoBehaviour
             Vector2 vSurface = vel - vNormal;
 
             //vNormal and multiply by bounciness constant and add to vSurface
-            pendingVelocity = (bounciness * vNormal) - (bounciness * bounceExaggeration) * vSurface;
+            // Check if collision is not with top wall or ground
+            if (IsNearZero(Vector2.Dot(normal, Vector2.down), 0.01f))
+            {
+                pendingVelocity = (bounciness * vNormal) - (bounciness * bounceExaggeration) * vSurface;
+            }
+            else
+            {
+                // Don't add exaggerated bounce
+                pendingVelocity = (bounciness * vNormal) - bounciness * vSurface;
+            }
+
             shouldBounce = true;
         }
     }
@@ -92,7 +100,7 @@ public class PlayerScript : MonoBehaviour
         float hDir = Input.GetAxis("Horizontal");
         if (hDir != 0 && !jumpButtonPressed)
         {
-            if(hDir != dir)
+            if (hDir != dir)
             {
                 dir = Mathf.Sign(hDir);
                 OnPlayerDirChanged?.Invoke(this, new OnPlayerDirChangedArgs { playerDir = dir });

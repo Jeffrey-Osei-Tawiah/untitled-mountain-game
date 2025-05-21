@@ -1,5 +1,5 @@
 using System;
-using Unity.VisualScripting;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerScript : MonoBehaviour
@@ -30,6 +30,7 @@ public class PlayerScript : MonoBehaviour
     [SerializeField] private float bounciness = 1;
     [SerializeField] private float bounceExaggeration = 0.2f;
     private Rigidbody2D rb;
+    private Collider2D col;
     private bool shouldBounce = false;
     private Vector2 pendingVelocity;
 
@@ -43,6 +44,11 @@ public class PlayerScript : MonoBehaviour
     private void Awake()
     {
         rb = gameObject.GetComponent<Rigidbody2D>();
+        List<Collider2D> cols = new List<Collider2D>();
+        rb.GetAttachedColliders(cols);
+
+        // Player has only one Collider2D
+        col = cols[0];
     }
 
     private void Start()
@@ -50,8 +56,8 @@ public class PlayerScript : MonoBehaviour
         OnPlayerDirChanged?.Invoke(this, new OnPlayerDirChangedArgs { playerDir = 1 });
     }
     private void Update()
-    {
-        HandleMovement();
+    {   
+            HandleMovement();
     }
 
     private void FixedUpdate()
